@@ -11,16 +11,20 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import java.util.ArrayList;
+import java.util.List;
 
 import java.io.IOException;
 
 public class AvalonGame extends Application {
+    private VBox root;
+
     @Override
     public void start(Stage stage) throws IOException {
-        VBox root = new VBox(10);
+        root = new VBox(10);
         Scene scene = new Scene(root, 800, 600);
 
-        setupWelcomeScreen(root);
+        setupWelcomeScreen();
 
         stage.setTitle("Avalon");
         stage.setScene(scene);
@@ -31,7 +35,9 @@ public class AvalonGame extends Application {
         launch();
     }
 
-    private void setupWelcomeScreen(VBox root) {
+    private void setupWelcomeScreen() {
+        root.getChildren().clear();
+
         Label welcomeLabel = new Label("Welcome to Avalon");
         welcomeLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
 
@@ -65,14 +71,58 @@ public class AvalonGame extends Application {
         alert.showAndWait();
     }
 
+
+    private List<Player> players;
+    private int currentPlayerIndex;
     private void startGame(int playerCount) {
+        System.out.println("Game started with " + playerCount + " players!");
+
+        players = new ArrayList<>();
         for (int i = 1; i <= playerCount; i++) {
-            Player player = new Player("Player " + i, Constants.RoleType.getRandomRole());
-            System.out.println("Player " + i + ":");
-            System.out.println("  Name: " + player.getName());
-            System.out.println("  Team: " + player.getTeam());
-            System.out.println("  Role: " + player.getRole());
-            System.out.println();
+            players.add(new Player("Player " + i, Constants.RoleType.getRandomRole()));
         }
+
+        currentPlayerIndex = 0;
+        showPlayerInfo();
+    }
+
+    private void showPlayerInfo() {
+        root.getChildren().clear();
+
+        Player currentPlayer = players.get(currentPlayerIndex);
+
+        Label playerInfoLabel = new Label();
+        updatePlayerInfoLabel(playerInfoLabel, currentPlayer);
+
+        Button nextPlayerButton = new Button("Next Player");
+        nextPlayerButton.setOnAction(e -> onNextPlayer());
+
+        root.getChildren().addAll(playerInfoLabel, nextPlayerButton);
+        root.setAlignment(Pos.CENTER);
+    }
+
+    private void updatePlayerInfoLabel(Label label, Player player) {
+        String info = String.format("Player: %s\nTeam: %s\nRole: %s",
+                player.getName(), player.getTeam(), player.getRole());
+        label.setText(info);
+    }
+
+    private void onNextPlayer() {
+        currentPlayerIndex++;
+        if (currentPlayerIndex < players.size()) {
+            showPlayerInfo();
+        } else {
+            showGameStartScreen();
+        }
+    }
+
+    private void showGameStartScreen() {
+        root.getChildren().clear();
+
+        Label gameStartLabel = new Label("All players have seen their roles. The game can now begin!");
+        gameStartLabel.setStyle("-fx-font-size: 18px; -fx-text-alignment: center;");
+
+        root.getChildren().add(gameStartLabel);
+        root.setAlignment(Pos.CENTER);
     }
 }
