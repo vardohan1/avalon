@@ -95,7 +95,7 @@ public class AvalonGame extends Application {
                 if (players.size() < remainingPlayers) {
                     askPlayerName(remainingPlayers);
                 } else {
-                    showPlayerInfo(); // Call showPlayerInfo() here after all players are added
+                    showPlayerInfo();
                 }
             } else {
                 showAlert("Invalid Input", "Please enter a name.");
