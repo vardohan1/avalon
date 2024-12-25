@@ -5,8 +5,10 @@ import com.example.avalon.model.Player;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
@@ -33,19 +35,44 @@ public class AvalonGame extends Application {
         Label welcomeLabel = new Label("Welcome to Avalon");
         welcomeLabel.setStyle("-fx-font-size: 24px; -fx-font-weight: bold;");
 
-        Button startButton = new Button("Start Game");
-        startButton.setOnAction(e -> startGame());
+        Label playerCountLabel = new Label("Enter number of players (5-10):");
+        TextField playerCountField = new TextField();
+        playerCountField.setMaxWidth(100);
 
-        root.getChildren().addAll(welcomeLabel, startButton);
+        Button startButton = new Button("Start Game");
+        startButton.setOnAction(e -> {
+            try {
+                int playerCount = Integer.parseInt(playerCountField.getText());
+                if (playerCount >= 5 && playerCount <= 10) {
+                    startGame(playerCount);
+                } else {
+                    showAlert("Invalid Input", "Please enter a number between 5 and 10.");
+                }
+            } catch (NumberFormatException ex) {
+                showAlert("Invalid Input", "Please enter a valid number.");
+            }
+        });
+
+        root.getChildren().addAll(welcomeLabel, playerCountLabel, playerCountField, startButton);
         root.setAlignment(Pos.CENTER);
     }
 
-    private void startGame() {
-        System.out.println("Game started!");
-        System.out.println("Loading game...");
-        Player player1 = new Player("Player 1", Constants.RoleType.getRandomRole());
-        System.out.println("name: " + player1.getName());
-        System.out.println("team: " + player1.getTeam());
-        System.out.println("role: " + player1.getRole());
+    private void showAlert(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+
+    private void startGame(int playerCount) {
+        for (int i = 1; i <= playerCount; i++) {
+            Player player = new Player("Player " + i, Constants.RoleType.getRandomRole());
+            System.out.println("Player " + i + ":");
+            System.out.println("  Name: " + player.getName());
+            System.out.println("  Team: " + player.getTeam());
+            System.out.println("  Role: " + player.getRole());
+            System.out.println();
+        }
     }
 }
