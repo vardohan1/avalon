@@ -75,15 +75,35 @@ public class AvalonGame extends Application {
     private List<Player> players;
     private int currentPlayerIndex;
     private void startGame(int playerCount) {
-        System.out.println("Game started with " + playerCount + " players!");
-
         players = new ArrayList<>();
-        for (int i = 1; i <= playerCount; i++) {
-            players.add(new Player("Player " + i, Constants.RoleType.getRandomRole()));
-        }
-
         currentPlayerIndex = 0;
-        showPlayerInfo();
+        askPlayerName(playerCount);
+    }
+
+    private void askPlayerName(int remainingPlayers) {
+        root.getChildren().clear();
+
+        Label nameLabel = new Label("Enter player " + (players.size() + 1) + "'s name:");
+        TextField nameField = new TextField();
+        nameField.setMaxWidth(200);
+
+        Button submitButton = new Button("Submit");
+        submitButton.setOnAction(e -> {
+            String name = nameField.getText().trim();
+            if (!name.isEmpty()) {
+                players.add(new Player(name, Constants.RoleType.getRandomRole()));
+                if (players.size() < remainingPlayers) {
+                    askPlayerName(remainingPlayers);
+                } else {
+                    showPlayerInfo(); // Call showPlayerInfo() here after all players are added
+                }
+            } else {
+                showAlert("Invalid Input", "Please enter a name.");
+            }
+        });
+
+        root.getChildren().addAll(nameLabel, nameField, submitButton);
+        root.setAlignment(Pos.CENTER);
     }
 
     private void showPlayerInfo() {
